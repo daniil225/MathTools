@@ -15,6 +15,7 @@ private:
 
 
 protected:
+    double eps = 1e-7; //  машинный ноль 
     ofstream fout; // Файловый поток на запись
     ifstream fin; // Файловый поток на чтение 
 
