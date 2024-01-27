@@ -3,79 +3,126 @@
 
 #include <cstdint>
 /* Определеим Структуры и функции для управления информацией о точке в расчетной области */
+/* В общем случае данный класс применим для объектов в 2D и 3D областях */
 
-namespace PointInfo2D
+/* Развертка информации о типе КУ  */
+struct BoundInfo
 {
-    struct Info
-    {
-    };
+    uint8_t size = 0;                // Сколько типов задано
+    uint8_t Cond[4]{0, 0, 0, 0};     // Набор формул определяющих КУ максимум 2
+    uint8_t TypeCond[4]{0, 0, 0, 0}; // Тип Краевого условия
+};
 
-    struct BoundInfo
-    {
-    };
+/* Развертка информации об области */
+struct AreaInfo
+{
+    uint8_t size = 0;
+    uint8_t Cond[8]{0, 0, 0, 0, 0, 0, 0, 0};
+};
 
-    struct AreaInfo
-    {
-    };
+struct Comand
+{
+    typedef const uint32_t ComandType;
+    /* Clear comand */
+    static ComandType BaseInfoClear = 0x00;
+    static ComandType AreaInfoClear = 0x00000000;
+    static ComandType BoundInfoClear = 0x0000;
+    static ComandType TypeBoundCondClear = 0x00;
 
-    struct Comand
-    {
-    };
+    /* Base Info comand */
+    static ComandType SetZeroFiFictitious = 0xFE;
+    static ComandType GetFiFictitious = 0x01;
 
-    /* Функции управления битовыми структурами */
-    /* Private Section */
+    /* Area Comand */
+    static ComandType SetZeroAreaCount = 0xE1;
+    static ComandType GetAreaCount = 0x1E;
+    static ComandType ShiftAreaCountBits = 1;
+    static ComandType RightBoundAreaCount = 8;
+    static ComandType RightBoundValAreaInfo = 15;
+    static ComandType BaseAreaShift = 4;
+    static ComandType GetAreaInfoBaseComand = 0x0000000F;
 
-    /* Очистка структуры */
-    void ClearInfo(Info &info);
+    /* Bound Comand */
+    static ComandType SetZeroBoundCount = 0x1F;
+    static ComandType ShiftBoundCountBits = 5;
+    static ComandType GetBoundCount = 0xE0;
+    static ComandType RightBoundBoundCount = 4;
+    static ComandType RightBoundValBoundInfo = 15;
+    static ComandType RightBoundValBoundType = 3;
+    static ComandType BaseBoundShift = 4;
+    static ComandType BaseTypeBoundShift = 2;
+    static ComandType GetBoundInfoBaseComand = 0x000F;
+    static ComandType GetTypeBoundBaseComand = 0x03;
+};
 
-    /* Установка фиктивный/не фиктивный узел
-        @param
-        Info& info - информационная структура
-        uint8_t val true - не фиктивный false - фиктивный
-        @return void
-    */
-    void SetFictitiousBit(Info &info, uint8_t val);
+struct Info
+{
+    uint64_t BaseInfo : 8;      /* Базовая информация */
+    uint64_t AreaInfo : 32;     /* Информация об области определяющей параметры ДУ */
+    uint64_t BoundInfo : 16;    /*Краевые условия просто набор формул */
+    uint64_t TypeBoundCond : 8; /* Тип Краевого условия */
+};
+
+class InfoManeger
+{
+private:
 
     /* Установка Количества различныйх типов областей которым принадлежит точка
         @param
-        Info& info - информационная структура
+        Info& info
         uint8_t val - диапазон [0;8]
-        @return void
+        ret void
     */
-    void SetAreaCountBits(Info &info, uint32_t val);
+    static void SetAreaCountBits(Info &info, uint32_t val);
 
     /* Установка Количества различных типов границ к которым примыкает данная точка
         @param
-        Info& info - информационная структура
+        Info& info
         uint8_t val - диапазон [0;4]
-        @return void
+        ret void
     */
-    void SetBoundCountBits(Info &info, uint32_t val);
+    static void SetBoundCountBits(Info &info, uint32_t val);
 
     /* Получить количество различных областей к которым примыкает точка
         @param
-        Info& info - информационная структура
-        @return uint32_t - информациоя о том к скольки областям примыкает  диапазон [0;8]
+        const Info &info
+        ret uint32_t - информациоя о том к скольки областям примыкает  диапазон [0;8]
         0 - ни к одной
         1 - к одной
         ...
     */
-    uint32_t GetAreaCount(const Info &info);
+    static uint32_t GetAreaCount(const Info &info);
 
     /* Получить количество различных областей к которым примыкает граница
         @param
-        Info& info - информационная структура
-        @return uint32_t - информациоя о том к скольки Границам примыкает(различным)  диапазон [0;4]
+        const Info &info
+        ret uint32_t - информациоя о том к скольки Границам примыкает(различным)  диапазон [0;4]
         0 - ни к какой
         1 - к одной
         2 -
         3 -
         4 -
     */
-    uint32_t GetBoundCount(const Info &info);
-    /*********************************************/
+    static uint32_t GetBoundCount(const Info &info);
 
-    /* Public section */
+public:
+
+    /* Очистка структуры */
+    /*
+        @param
+        Info& info
+        @return void
+        Очистка структуры
+    */
+    static void ClearInfo(Info &info);
+
+    /* Установка фиктивный/не фиктивный узел
+        @param
+        Info& info
+        uint8_t val true - не фиктивный false - фиктивный
+        ret void
+    */
+    static void SetFictitious(Info &info, uint8_t val);
 
     /*
         @param
@@ -83,69 +130,52 @@ namespace PointInfo2D
         uint32_t val - набор формул задающий значения на границе диапазон [0,15]
         uint32_t boundType - тип Ку диапазон  [0,3]
     */
-    void SetBoundInfo(Info &info, uint32_t val, uint32_t boundType);
+    static void SetBoundInfo(Info &info, uint32_t val, uint32_t boundType);
+
     /*
         @param
         Info& info
         uint32_t val - набор формул задающий значения в области определяющей параметры ДУ  диапазон [0,15]
     */
-    void SetAreaInfo(Info &info, uint32_t val);
+    static void SetAreaInfo(Info &info, uint32_t val);
 
     /*
         @param
         const Info& info
-        @return bool - false - фиктивный true - не фиктивный
+        ret bool - false - фиктивный true - не фиктивный
     */
-    bool IsFiFictitious(const Info &info);
+    static bool IsFiFictitious(const Info &info);
 
     /*
         @param
         const Info& info
-        @return bool - false - не граница true - граница
+        ret bool - false - не граница true - граница
     */
-    bool IsBound(const Info &info);
+    static bool IsBound(const Info &info);
 
     /*
         @param
         const Info& info
-        @return BoundInfo -структура содержащая информацию о типах Ку и формул которые их задают
+        ret BoundInfo -структура содержащая информацию о типах Ку и формул которые их задают
     */
-    BoundInfo GetBoundInfo(const Info &info);
+    static BoundInfo GetBoundInfo(const Info &info);
 
     /*
         @param
         const Info& info
-        @return AreaInfo -структура содержащая информацию о типах областей которым принадлежит точка и как следствие это определяет парметры ДУ
+        ret AreaInfo -структура содержащая информацию о типах областей которым принадлежит точка и как следствие это определяет парметры ДУ
     */
-    AreaInfo GetAreaInfo(const Info &info);
+    static AreaInfo GetAreaInfo(const Info &info);
     /********************************************/
 
     /* Debug functions */
-    void PrintInfo(const Info &info);
+    static void PrintInfo(const Info &info);
 
-    void PrintBoundInfo(const BoundInfo &Bound);
+    static void PrintBoundInfo(const BoundInfo &Bound);
 
-    void PrintAreaInfo(const AreaInfo &Area);
+    static void PrintAreaInfo(const AreaInfo &Area);
 
-};
-
-namespace PointInfo3D
-{
-    struct Info
-    {
-    };
-
-    struct BoundInfo
-    {
-    };
-
-    struct AreaInfo
-    {
-    };
-
-    struct Comand
-    {
-    };
+    ~InfoManeger() = default;
 };
 
 #endif
