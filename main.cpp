@@ -1,29 +1,21 @@
-#include "PointInfo.h"
-
+#include "Grid2D_Quad.h"
+#include <iostream>
 int main()
 {
 
-    Info info;
+    Grid2D_Quad Grid("CalcArea1.txt");
+    GridStatus status = Grid.GenerateGrid();
 
-    InfoManeger::ClearInfo(info);
-    InfoManeger::SetFictitious(info, 1);
-    
-    InfoManeger::SetAreaInfo(info, 12);
-    InfoManeger::SetAreaInfo(info, 11);
-    InfoManeger::SetAreaInfo(info, 10);
-    InfoManeger::SetAreaInfo(info, 10);
-    InfoManeger::SetAreaInfo(info, 10);
-    InfoManeger::SetAreaInfo(info, 10);
+    //
 
-    InfoManeger::SetBoundInfo(info, 1, 3);
-    InfoManeger::SetBoundInfo(info, 2, 1);
-    InfoManeger::SetBoundInfo(info, 2, 1);
-    InfoManeger::SetBoundInfo(info, 2, 1);
-
-    InfoManeger::PrintInfo(info);
-
-    BoundInfo binf = InfoManeger::GetBoundInfo(info);
-    InfoManeger::PrintBoundInfo(binf);
-
+    cout << status.GetMsg();
+    Grid.PrintGrid();
+    InfoManeger::PrintInfo(Grid[0].info);
+    InfoManeger::PrintInfo(Grid[1].info);
+    InfoManeger::PrintInfo(Grid[2].info);
+    InfoManeger::PrintInfo(Grid[3].info);
+    InfoManeger::PrintInfo(Grid[4].info);
+    InfoManeger::PrintInfo(Grid[5].info);
+    InfoManeger::PrintInfo(Grid[6].info);
     return 0;
 }

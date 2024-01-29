@@ -9,7 +9,10 @@ enum State
 {
     OK,
     LOAD_ERROR,
-    GRID_GENERATE_ERROR
+    FILE_OPEN_ERROR,
+    MEMORY_ALLOC_ERROR,
+    GRID_GENERATE_ERROR,
+    UNKNOWN_ERROR
 };
 
 struct Status
@@ -34,7 +37,7 @@ public:
     inline State GetState() { return status.state; }
     inline void SetStatus(const State& state, const string &msg) { status = {state, msg}; }
 
-    ~GridStatus();
+    ~GridStatus() = default;
 };
 
 #endif

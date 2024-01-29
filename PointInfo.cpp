@@ -135,11 +135,11 @@ bool InfoManeger::IsBound(const Info &info)
 BoundInfo InfoManeger::GetBoundInfo(const Info &info)
 {
     BoundInfo Bound;
-    uint32_t Bnum = GetBoundCount(info);
+    int32_t Bnum = GetBoundCount(info);
+    
+    Bound.size = Bnum;
 
-    Bound.size = (uint8_t)Bnum;
-
-    for (uint32_t i = 0; i <= Bnum - 1; i++)
+    for (int32_t i = 0; i <= Bnum - 1; i++)
     {
         Bound.Cond[i] = (info.BoundInfo & (Comand::GetBoundInfoBaseComand << i * Comand::BaseBoundShift)) >> i * Comand::BaseBoundShift;
         Bound.TypeCond[i] = (info.TypeBoundCond & (Comand::GetTypeBoundBaseComand << i * Comand::BaseTypeBoundShift)) >> i * Comand::BaseTypeBoundShift;

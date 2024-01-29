@@ -58,6 +58,7 @@
   "C_Cpp_Runner.msvcSecureNoWarnings": false,
   "files.associations": {
     "compare": "cpp",
-    "cstdint": "cpp"
+    "cstdint": "cpp",
+    "new": "cpp"
   }
 }

@@ -7,7 +7,7 @@
 
 using namespace std;
 
-
+template<class BaseGridXD, class ElementXD>
 class GridI
 {
 
@@ -24,17 +24,23 @@ public:
     GridI() = default;
     
     /* Загрузка базовой сетки из файла и по ней строится уже все */
-    virtual GridStatus Load(const string& filename) noexcept;
+    virtual GridStatus Load(const string& filename) noexcept = 0;
 
     /* Генерация сетки */
-    virtual GridStatus GenerateGrid() noexcept;
+    virtual GridStatus GenerateGrid() noexcept = 0;
 
     /* Дробление сетки в заданное количество раз */
-    virtual GridStatus DivideGrid(const int coef) noexcept;
+    virtual GridStatus DivideGrid(const int coef) noexcept = 0;
+
+    /* Получить базовую сетку */
+    virtual BaseGridXD GetBaseGrid() const noexcept = 0;
+
+    /* Получить шаблонный элемент который необходим */
+    virtual ElementXD GetElement(int idx) const noexcept = 0;
 
     /* Перегенерация сетки при изменении ее параметров */
-    virtual GridStatus ReGenerateGrid() noexcept;
-    virtual ~GridI();
+    virtual GridStatus ReGenerateGrid() noexcept = 0;
+    virtual ~GridI() = default;
 
 };
 

@@ -3,6 +3,7 @@
 #include "Grid.h"
 #include "PointInfo.h"
 #include <vector>
+#include <functional>
 
 using namespace std;
 
@@ -47,8 +48,8 @@ struct BaseGrid2D
     /* Точка */
     struct PointXY
     {
-        double x;
-        double y;
+        double x = 0;
+        double y = 0;
     };
 
     struct DivideParamS
@@ -92,18 +93,73 @@ struct Point
     double y = 0.0;
 };
 
+/* Структура для Конечного Элемента в форме произвольного четырехугольника*/
+struct FElement_Quad2D
+{
+
+};
+
+/* Структура для шаблона типа Крест для конечно-разностной схемы*/
+struct Cross_TypeTemplate
+{
+    static const int CrossTemplateSize = 5; // Количество точек в шаблоне
+    Point point[CrossTemplateSize]; // Точки шаблона
+    int AreaInfo = -1; //  Номер формул задающий параметры ДУ в данной модификации он принимает только 1 значение
+        
+    uint8_t size = 0; // Фактический размер тоесть сколько всего точек в массиве point [0,5]
+
+    /* Информация про главный узел */
+    /*
+        isFictive     isBound
+            0           0       => Просто внутренний узел
+            0           1       => Не фиктивный и граница ставим апроксимацию краевых в данное место
+            1           0       => Фиктивный => на диагональ ставим 1
+            1           1       => не возможно
+    */
+    bool isFictive = false; // Не фиктивный узел
+    bool isBound = false; // Не граница 
+
+
+    /*Если все же это граница то будем инициализировать на */
+    int ProjNormX = 0; // Проекция внешней нормали для X
+    int ProjNormY = 0; // Проекция внешней нормали для Y
+};
+
+
 /* Класс сетки */
-class Grid2D_Quad : public GridI
+// Модификация для разностной схемы, но легко модифицируется для МКЭ
+class Grid2D_Quad : public GridI<BaseGrid2D,Cross_TypeTemplate>
 {
 
 private:
     BaseGrid2D baseGrid;
 
     int Dim = 0; // Размерность сетки и СЛАУ в то же время
-    int Nx = 0;  // Сумарное количество узлов по оси Х
-    int Ny = 0;  // Сумарное количество узлов по оси У все величины получаются после генерации сетки
+    int GlobalNx = 0;  // Сумарное количество узлов по оси Х
+    int GlobalNy = 0;  // Сумарное количество узлов по оси У все величины получаются после генерации сетки
 
     vector<Point> Grid; // Массив точек получающийся при генерации конечных элементов
+
+    /* Расчитать общее число узлов получающееся в сетке */
+    void GetTotalNumberOfNodes() noexcept;
+    
+    /* Генерация всей расчетной области без учетка фиктивных элементов и принадлежности к какой либо границе и расчетной области */
+    void GenerateBaseGrid(GridStatus &status) noexcept;
+
+    /* Учет фиктивных узлов */
+    void DivisionIntoSubAreas(GridStatus &status) noexcept;
+
+    /* Функция учетка типа КУ и установка факта является ли элемент граничным */
+    void DivisionIntoSubBounds(GridStatus &status) noexcept;
+
+    /* Вернет число соответсвующее стартовой позиции по сути это скачок  */
+    /*
+        @param
+        int i - номер
+        int axis - соответсвующая ость 0 - x, 1 - z 2 - y
+        @return int: Величина скачка в сетке
+    */
+    int  Getlevel(int i, int axis) const noexcept;
 
 protected:
 public:
@@ -171,7 +227,24 @@ public:
         void
         @return: BaseGrid2D
     */
-    BaseGrid2D GetBaseGrid() noexcept;
+    BaseGrid2D GetBaseGrid() const noexcept;
+
+    /* Получить шаблонный элемент для разностной схемы */
+    /*
+        @param:
+        int idx - Индекс центральной точки в глобальной нумерации
+        @return: Cross_TypeTemplate - Структура содержащая всю необходимую информацию
+    */
+    Cross_TypeTemplate GetElement(int idx) const noexcept;
+
+
+    /* Получить шаблонный элемент для получения Конечного элемента */
+    /*
+        @param:
+        int idx - Индекс центральной точки в глобальной нумерации
+        @return: FElement_Quad2D - Структура содержащая всю необходимую информацию
+    */
+    //FElement_Quad2D GetElement(int idx) const noexcept;
 
     /* Установка параметров базовой сетки */
     /*
@@ -180,6 +253,13 @@ public:
         @return: GridStatus
     */
     GridStatus SetBaseGrid(const BaseGrid2D &baseGrid_) noexcept;
+
+
+    Point& operator[](int idx) noexcept;
+
+    /*  Debug functions */
+    void PrintBaseGrid() const noexcept;
+    void PrintGrid() const noexcept;
 
     ~Grid2D_Quad() = default;
 };
