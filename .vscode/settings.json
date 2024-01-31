@@ -59,6 +59,7 @@
   "files.associations": {
     "compare": "cpp",
     "cstdint": "cpp",
-    "new": "cpp"
+    "new": "cpp",
+    "iostream": "cpp"
   }
 }

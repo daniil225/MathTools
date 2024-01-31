@@ -151,10 +151,10 @@ BoundInfo InfoManeger::GetBoundInfo(const Info &info)
 AreaInfo InfoManeger::GetAreaInfo(const Info &info)
 {
     AreaInfo Area;
-    uint32_t Anum = GetAreaCount(info);
+    int32_t Anum = GetAreaCount(info);
     Area.size = (uint8_t)Anum;
 
-    for (uint32_t i = 0; i <= Anum - 1; i++)
+    for (int32_t i = 0; i <= Anum - 1; i++)
         Area.Cond[i] = (info.AreaInfo & (Comand::GetAreaInfoBaseComand << Comand::BaseAreaShift * i)) >> Comand::BaseAreaShift * i;
 
     return Area;

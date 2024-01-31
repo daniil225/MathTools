@@ -247,7 +247,7 @@ void Grid2D_Quad::DivisionIntoSubAreas(GridStatus &status) noexcept
     {
         int AreaNum = -1;    // номер подобласти (определяет набор формул отвечающих параметрам ДУ)
         int PlaneXZSize = 0; // Размер массива PlaneXZ
-        int *PlaneXZ;        // Массив точек многоугольника (номера)
+        int *PlaneXY;        // Массив точек многоугольника (номера)
     };
     int *BoundGrid = nullptr;
     try
@@ -278,8 +278,10 @@ void Grid2D_Quad::DivisionIntoSubAreas(GridStatus &status) noexcept
             int rightStartX = Getlevel(baseGrid.CalculationArea[i][2], 0) + GlobalNx * Getlevel(baseGrid.CalculationArea[i][3], 1);
             int rightEndX = Getlevel(baseGrid.CalculationArea[i][2], 0) + GlobalNx * Getlevel(baseGrid.CalculationArea[i][4], 1);
 
+
             int nX = (rightEndX - rightStartX) / GlobalNx;
             int nY = (rightStartX - leftStartX);
+            
 
             int idxBoundGrid = 0;
             for (int i = 0; i <= nX; i++)
@@ -293,7 +295,7 @@ void Grid2D_Quad::DivisionIntoSubAreas(GridStatus &status) noexcept
                 }
             }
             Bound.PlaneXZSize = idxBoundGrid;
-            Bound.PlaneXZ = BoundGrid;
+            Bound.PlaneXY = BoundGrid;
 
             return Bound;
         };
@@ -307,7 +309,7 @@ void Grid2D_Quad::DivisionIntoSubAreas(GridStatus &status) noexcept
         */
         auto BinarySerch = [](const BoundArea &Bound, int numPointGlobal) -> bool
         {
-            int *arr = Bound.PlaneXZ;
+            int *arr = Bound.PlaneXY;
             int left = 0;
             int right = Bound.PlaneXZSize - 1;
             int midd = 0;
@@ -478,8 +480,7 @@ void Grid2D_Quad::DivisionIntoSubBounds(GridStatus &status) noexcept
                 int StartPositionY = Getlevel(baseGrid.BoundsArea[i][2], 0) + GlobalNx * Getlevel(baseGrid.BoundsArea[i][4], 1); // Стартовая позиция для  Y
                 int EndPositionY = Getlevel(baseGrid.BoundsArea[i][2], 0) + GlobalNx * Getlevel(baseGrid.BoundsArea[i][5], 1);   // Конечная точка для оси Y
 
-                int nY = (EndPositionY - StartPositionY) / GlobalNx; //  Количество узлов по оси Y
-
+                int nY = (EndPositionY - StartPositionY) / GlobalNx + 1; //  Количество узлов по оси Y
                 int Idx = StartPositionY;
                 for (int i = 0; i <= nY; i++)
                 {
@@ -495,8 +496,7 @@ void Grid2D_Quad::DivisionIntoSubBounds(GridStatus &status) noexcept
                 /* Определяем базовые узлы по оси OX, а потом аналогично растиражируем узлы по границе (Дробление фиксированное) шаг по массиву + 1 */
                 int StartPositionX = Getlevel(baseGrid.BoundsArea[i][2], 0) + GlobalNx * Getlevel(baseGrid.BoundsArea[i][4], 1); // Стартовая позиция по оси Х
                 int EndPositionX = Getlevel(baseGrid.BoundsArea[i][3], 0) + GlobalNx * Getlevel(baseGrid.BoundsArea[i][4], 1);   // Конечная позиция по оси Х
-                int nX = EndPositionX - StartPositionX;                                                                          //  Количество узлов по оси X
-
+                int nX = EndPositionX - StartPositionX + 1;                                                                          //  Количество узлов по оси X
                 int idxBoundGrid = 0;
                 int Idx = StartPositionX;
                 for (int j = 0; j <= nX; j++)
@@ -504,7 +504,6 @@ void Grid2D_Quad::DivisionIntoSubBounds(GridStatus &status) noexcept
                     MemoryPool[j] = Idx;
                     Idx++;
                 }
-
                 bound.Line = MemoryPool;
                 bound.Size = nX;
             }
