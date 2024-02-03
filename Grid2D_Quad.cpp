@@ -649,12 +649,25 @@ GridStatus Grid2D_Quad::GenerateGrid() noexcept
 GridStatus Grid2D_Quad::DivideGrid(const int coef) noexcept
 {
     GridStatus status;
+    baseGrid.CountOfDivision *= coef;
+    for (int i = 0; i < baseGrid.Nx - 1; i++)
+	{
+		baseGrid.DivideParam[0][i].num *= coef;
+	}
+	for (int i = 0; i < baseGrid.Ny - 1; i++)
+	{
+		baseGrid.DivideParam[1][i].num *= coef;
+	}
     return status;
 }
 
 GridStatus Grid2D_Quad::ReGenerateGrid() noexcept
 {
     GridStatus status;
+    Dim = 0;
+	GlobalNx = 0;
+	GlobalNy = 0;
+	GenerateGrid();
     return status;
 }
 
