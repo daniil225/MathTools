@@ -9,13 +9,16 @@
 
 /* Шаблон расчетной области - 5-и точечный крест => получается, что краевые узлы не входят в расчетную область */
 
+
 struct BoundCond
 {
-    /* 1 КУ */
-
-    /* 3 КУ */
+    int num = 0; // Порядковый номер границы
+    int typeBound = 0; // Тип КУ
+    vector<int> idx; // Индексы на гарнице с учетом которых и будет производиться расчет 
+    function<double(double)> func[2];
 };
 
+/* Эту структуру инициализируем руками для получения тестов. */
 struct DEquation
 {
     double lambda = 0;
@@ -28,7 +31,7 @@ struct DEquation
     function<double(double, double)> u_true;
 
     /* КУ */
-    BoundCond Bound;
+    BoundCond Bound[6];
 };
 
 
@@ -47,11 +50,11 @@ private:
     /*  Параметры ДУ */
     DEquation deq;
     
+    /* Массив внутренних точек Расчетной области */
+    vector<int>InternalNode;
+    
     /* Генерация Матрицы в которой уже учитывается все необходимое тоесть все КУ */
     bool GenerateMatrix();
-
-    /* Угловые узлы они в расчетную область не входят их всего 5 штук */
-    pair<int, int> AngularPoint[5];
 
 public: 
 
