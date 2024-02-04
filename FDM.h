@@ -39,6 +39,8 @@ class FDM
 {
 
 private:
+    // false - не равномерная сетка
+    // true - равномерная сетка
     bool IsravGrid = false;
     Grid2D_Quad Grid;
     Matrix matr;
@@ -52,6 +54,8 @@ private:
     
     /* Массив внутренних точек Расчетной области */
     vector<int>InternalNode;
+
+    vector<bool> CheckNode;
     
     /* Генерация Матрицы в которой уже учитывается все необходимое тоесть все КУ */
     bool GenerateMatrix();

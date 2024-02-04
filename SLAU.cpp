@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <cmath>
 #include <iostream>
+#include <iomanip>
 
 
 /* Matrix */
@@ -182,7 +183,7 @@ void Matrix::PrintDenseFormatMatrix()
     {
         for(int j = 0; j < N; j++)
         {
-            std::cout << GetElement(i,j) << " ";
+            std::cout << std::setw(3) << std::setprecision(3) << GetElement(i,j) << " ";
         }
         std::cout << "\n";
     }
