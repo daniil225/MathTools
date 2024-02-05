@@ -12,10 +12,8 @@
 
 struct BoundCond
 {
-    int num = 0; // Порядковый номер границы
     int typeBound = 0; // Тип КУ
-    vector<int> idx; // Индексы на гарнице с учетом которых и будет производиться расчет 
-    function<double(double)> func[2];
+    function<double(double, double)> func[2];
 };
 
 /* Эту структуру инициализируем руками для получения тестов. */
@@ -31,7 +29,7 @@ struct DEquation
     function<double(double, double)> u_true;
 
     /* КУ */
-    BoundCond Bound[6];
+    vector<BoundCond> Bound;
 };
 
 
@@ -52,10 +50,9 @@ private:
     /*  Параметры ДУ */
     DEquation deq;
     
-    /* Массив внутренних точек Расчетной области */
-    vector<int>InternalNode;
-
-    vector<bool> CheckNode;
+    /* Номера гранниц */
+    int BoundsNodesIdx = 0;
+    vector<int> BoundsNodes; //  Размер 4 * maxSize
     
     /* Генерация Матрицы в которой уже учитывается все необходимое тоесть все КУ */
     bool GenerateMatrix();
