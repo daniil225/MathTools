@@ -69,11 +69,12 @@ public:
 
     // Расчет расстояния между истинным и расчитанным рещениями считаем как сумма Квадратов разности 
     // под Корнем в общем евклидовское расстояние 
-    double Norma() const;
+    double Norma();
 
 
     inline void DivideGrid(const int coef) { Grid.DivideGrid(coef); Grid.ReGenerateGrid(); }
-    
+
+    void PrintTable();
 
     FDM& operator=(const FDM&) = delete;
 

@@ -1,6 +1,7 @@
 #include "FDM.h"
 #include <cmath>
 #include <iostream>
+#include <stdio.h>
 
 /* Private section */
 bool FDM::GenerateMatrix()
@@ -23,11 +24,10 @@ FDM::FDM(const string &filename, DEquation deq_, bool IsravGrid_): deq(deq_), Is
     matr.m = m;
     matr.N = Grid.Dim;
     matr.SaveMemory(); // Есть матрица уже нужной структуры 
-    matr.PrintDenseFormatMatrix();
     // Размеры массивов под граничные массивы 
     BoundsNodes.resize(4*max(Grid.GlobalNx, Grid.GlobalNy));
 
-    Grid.PrintGrid();
+    //Grid.PrintGrid();
 }
 
 void FDM::Solve()
@@ -59,14 +59,22 @@ void FDM::Solve()
                         BoundInfo bif = InfoManeger::GetBoundInfo(centralNode.info);
                         int typeCond = (int32_t)bif.TypeCond[0];
                         // 1 КУ
-                        if(typeCond == 1)
+                        if(typeCond == 1 || (int)bif.TypeCond[1] == 1)
                         {
+                            // В рамках задачи на границе может быть только 2 и 1 или 3 и 1 => т.к 1КУ перекрывают все заносим индекс в массив 
                             BoundsNodes[BoundsNodesIdx] = m;
                             BoundsNodesIdx++;
+                            //cout << "\nNode num = " << m << " Bound Info\n";
+                            //cout << "Node = " << m << "\n";
                         }
                         else if(typeCond == 2)
                         {
-                            // 2КУ Заносим в матрицу нужные знаения 
+                            
+                            hy = Grid[m + Grid.GlobalNx].y - Grid[m].y;
+                            // Учет 2 КУ везде это первый элемент на границе S6 
+                            matr.add(m, m, lambda/hy);
+                            matr.add(m, m+Grid.GlobalNx, -lambda/hy);
+                            slau.f[m] = deq.Bound[(int)bif.Cond[0]].func[0](Grid[m].x, Grid[m].y);
                         }
                         else
                         {
@@ -117,19 +125,19 @@ void FDM::Solve()
             // Вносим значения в праую часть 
             slau.f[m] = deq.Bound[(int)bif.Cond[0]].func[0](Grid[m].x, Grid[m].y);
         }
-
+        //matr.PrintDenseFormatMatrix();
         Zeidel(matr, uij, slau);
-        int k = 0;
-        for(double u: uij)
-        {
-            if(k == Grid.GlobalNx)
-            {
-                cout << "\n";
-                k = 0;
-            }
-            k++;
-            cout << u << " ";
-        }
+        //int k = 0;
+        // for(double u: uij)
+        // {
+        //     if(k == Grid.GlobalNx)
+        //     {
+        //         cout << "\n";
+        //         k = 0;
+        //     }
+        //     k++;
+        //     cout << u << " ";
+        // }
 
     }
     else
@@ -139,9 +147,54 @@ void FDM::Solve()
     
 }
 
- double FDM::Norma() const
+ double FDM::Norma()
  {
     double res = 0;
 
-    return res;
+    /* В цикле по узлам */
+    for(int i = 0; i < Grid.GlobalNy; i++)
+    {
+        for(int j = 0; j < Grid.GlobalNx; j++)
+        {
+            int m = i*Grid.GlobalNx + j;
+            
+            if(InfoManeger::IsFiFictitious(Grid[m].info) && !InfoManeger::IsBound(Grid[m].info))
+            {
+                res += pow(deq.u_true(Grid[m].x, Grid[m].y) - uij[m], 2);
+            }
+        }
+    }
+
+    return sqrt(res);
+ }
+
+ void FDM::PrintTable()
+ {
+     /* В цикле по узлам */
+    printf("\n\n Расчетная таблица. Символом * отмечены внутренние узлы сетки\n");
+    printf("-------------------------------------------------------------------------------------------\n");
+    printf("|N             |X             |Y             |U             |U*            |   |U* - U|   |\n");
+    printf("|--------------|--------------|--------------|--------------|--------------|--------------|\n");
+    for(int i = 0; i < Grid.GlobalNy; i++)
+    {
+        for(int j = 0; j < Grid.GlobalNx; j++)
+        {
+            int m = i*Grid.GlobalNx + j;
+            if(InfoManeger::IsFiFictitious(Grid[m].info))
+            {
+                double u_true = deq.u_true(Grid[m].x, Grid[m].y);
+                if(InfoManeger::IsBound(Grid[m].info))
+                {
+                    printf("|%14d|%14.3f|%14.3f| %e | %e | %e |\n", m,Grid[m].x, Grid[m].y, uij[m], u_true, abs(u_true - uij[m]));
+                }
+                else
+                {
+                    printf("|*%13d|%14.3f|%14.3f| %e | %e | %e |\n", m,Grid[m].x, Grid[m].y, uij[m], u_true, abs(u_true - uij[m]));
+                }
+               
+               
+            }   
+        }
+    }
+    printf("-------------------------------------------------------------------------------------------\n");
  }
