@@ -54,8 +54,8 @@ double NormVec(const std::vector<double>& vec);
 /* Структура для генерации СЛАУ */
 struct SLAUData
 {
-	int MAX_ITER = 10e2; // Базовое количество максимального числа итераций 
-	double eps = 1e-10; // Базовое значение невязки 
+	int MAX_ITER = 20e2; // Базовое количество максимального числа итераций 
+	double eps = 1e-14; // Базовое значение невязки 
 	std::vector<double> f;
 };
 
