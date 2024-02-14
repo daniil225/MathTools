@@ -56,7 +56,7 @@ private:
     
     /* Генерация Матрицы в которой уже учитывается все необходимое тоесть все КУ */
     bool GenerateMatrix();
-    const int coef = 8;
+    const int coef = 1;
 public: 
 
     FDM() = delete;

@@ -7,9 +7,9 @@
       "request": "launch",
       "args": [],
       "stopAtEntry": false,
-      "externalConsole": true,
-      "cwd": "c:/GitHub/MathTools",
-      "program": "c:/GitHub/MathTools/build/Debug/outDebug",
+      "externalConsole": false,
+      "cwd": "/home/daniil/Desktop/GitHub/MathTools",
+      "program": "/home/daniil/Desktop/GitHub/MathTools/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
@@ -19,32 +19,6 @@
           "ignoreFailures": true
         }
       ]
-    },
-    {
-      "name": "C/C++: gcc.exe build and debug active file",
-      "type": "cppdbg",
-      "request": "launch",
-      "program": "${fileDirname}\\${fileBasenameNoExtension}.exe",
-      "args": [],
-      "stopAtEntry": false,
-      "cwd": "C:/Users/Asus Tuf/gcc/bin",
-      "environment": [],
-      "externalConsole": false,
-      "MIMode": "gdb",
-      "miDebuggerPath": "C:\\Users\\Asus Tuf\\gcc\\bin\\gdb.exe",
-      "setupCommands": [
-        {
-          "description": "Enable pretty-printing for gdb",
-          "text": "-enable-pretty-printing",
-          "ignoreFailures": true
-        },
-        {
-          "description": "Set Disassembly Flavor to Intel",
-          "text": "-gdb-set disassembly-flavor intel",
-          "ignoreFailures": true
-        }
-      ],
-      "preLaunchTask": "C/C++: gcc.exe build active file"
     }
   ]
 }
